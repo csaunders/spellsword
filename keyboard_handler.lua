@@ -74,6 +74,20 @@ function KeyboardHandler:handleChosenWord(key)
   end
 end
 
+function KeyboardHandler:direction()
+  d = self.chosenWord
+  dw = nil
+  if d == KeyboardHandler.PUP then
+    dw = "up"
+  elseif d == KeyboardHandler.PDOWN then
+    dw = "down"
+  elseif d == KeyboardHandler.PLEFT then
+    dw = "left"
+  elseif d == KeyboardHandler.PRIGHT then
+    dw = "right"
+  end
+  return dw
+end
 
 function KeyboardHandler:draw(character)
   x, y = character.x, character.y

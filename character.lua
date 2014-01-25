@@ -16,16 +16,17 @@ function Character.NewCharacter(x, y, name, scale)
   return self
 end
 
-function Character:move(direction)
+function Character:move(direction, x, y)
   if direction == "up" then
-    self.y = self.y - self.height
+    y = y + self.height
   elseif direction == "down" then
-    self.y = self.y + self.height
+    y = y - self.height
   elseif direction == "left" then
-    self.x = self.x - self.width
+    x = x - self.width
   elseif direction == "right" then
-    self.x = self.x + self.width
-  end    
+    x = x + self.width
+  end
+  return x, y
 end
 
 function Character:injure(attribute, amount)
