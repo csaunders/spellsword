@@ -103,6 +103,7 @@ end
 
 function KeyboardHandler:draw(cursor)
   image = KeyboardHandler.ARROW
+  setFontSize(22)
 
   local width, height = image:getWidth(), image:getHeight()
   for i=1,table.getn(self.words) do
@@ -128,7 +129,7 @@ function KeyboardHandler:draw(cursor)
         cursor:moveBy(width/2, 0)
       end
       self:drawWord(cursor, i)
-      cursor:draw()
+      -- cursor:draw()
     end
   end
   cursor:reset()
@@ -146,7 +147,8 @@ function KeyboardHandler:drawWord(cursor, i)
   while static[sidx] ~= actual[idx] do
     sidx = sidx + 1
   end
-  cursor:moveBy(-(width / 2), 0)
+  self:compensateForLocation(word, cursor, i, font)
+  cursor:moveBy(-width/2, -height/2)
   if sidx ~= idx then
     love.graphics.setColor(0xFF, 0, 0)
     message = string.sub(word, 1, sidx - 1)
@@ -157,4 +159,16 @@ function KeyboardHandler:drawWord(cursor, i)
   message = string.sub(word, sidx)
   love.graphics.print(message, cursor.x, cursor.y)
   love.graphics.reset()
+end
+
+function KeyboardHandler:compensateForLocation(word, cursor, i, font)
+  if i == KeyboardHandler.PUP then
+    cursor:moveBy(0, -5)
+  elseif i == KeyboardHandler.PDOWN then
+    cursor:moveBy(0, 5)
+  elseif i == KeyboardHandler.PLEFT then
+    cursor:moveBy(-font:getWidth(word)/2,0)
+  else
+    cursor:moveBy(font:getWidth(word)/2, 0)
+  end
 end

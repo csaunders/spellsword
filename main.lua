@@ -59,6 +59,10 @@ function drawImage(cursor, image, rads)
   if gameDebug then cursor:draw() end
 end
 
+function setFontSize(size)
+  love.graphics.setNewFont('fonts/manaspace.regular.ttf', size or 14)
+end
+
 function handler()
   return modeSwitcher:handler()
 end
