@@ -12,6 +12,7 @@ character = nil
 words = nil
 status = nil
 modeSwitcher = nil
+gameDebug = false
 
 function love.load()
   if arg and arg[#arg] == "-debug" then require("mobdebug").start() end
@@ -39,6 +40,25 @@ function love.keypressed(key, unicode)
   end
 end
 
+function drawImage(cursor, image, rads)
+  width, height = image:getWidth() / 2, image:getHeight() / 2
+  multX, multY = 1, 1
+  if rads == 3.14159 then -- rotated 180deg
+    -- nothing to
+  elseif rads > 3.14159 and rads < 2*3.14159 then -- rotated 270deg
+    multX = -1
+  elseif rads > 0 and rads < 3.14159 then -- rotated 90deg
+    multX = 1
+    multY = -1
+  else -- rotated 0deg
+    multX = -1
+    multY = -1
+  end
+
+  love.graphics.draw(image, cursor.x + (multX*width), cursor.y + (multY*height), rads)
+  if gameDebug then cursor:draw() end
+end
+
 function handler()
   return modeSwitcher:handler()
 end
@@ -48,7 +68,7 @@ function tick(response)
     gCamX, gCamY = character:move(handler():direction(), gCamX, gCamY)
     modeSwitcher:reset()
   elseif response == KeyboardHandler.FAILURE then
-    character.injure('focus')
+    character:injure('focus')
     modeSwitcher:reset()
   end
 end

@@ -20,9 +20,9 @@ end
 
 function Character:move(direction, x, y)
   if direction == "up" then
-    y = y + self.height
-  elseif direction == "down" then
     y = y - self.height
+  elseif direction == "down" then
+    y = y + self.height
   elseif direction == "left" then
     x = x - self.width
   elseif direction == "right" then
@@ -31,12 +31,11 @@ function Character:move(direction, x, y)
   return x, y
 end
 
-function Character:injure(attribute, amount)
-  amount = amount or math.random(10)
+function Character:injure(attribute)
   if attribute == "health" then
-    self.hp = self.hp - amount
+    self.current_hp = self.current_hp - 1
   elseif attribute == "focus" then
-    self.focus = self.focus - amount
+    self.current_focus = self.current_focus - 1
   end
 end
 

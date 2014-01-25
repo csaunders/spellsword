@@ -5,12 +5,18 @@ KeyboardHandler = {
   PRIGHT = 4,
   SUCCESS = 5,
   FAILURE = 6,
-  PROCESSING = 7
-  ARROW = love.graphics.newImage('gfx/arrow_up.png')
+  PROCESSING = 7,
+  ARROW = love.graphics.newImage('gfx/arrow_up.png'),
+  ONLYDRAW = 4
 }
+
 KeyboardHandler.__index = KeyboardHandler
 
 function KeyboardHandler.NewHandler(dictionary, words)
+  if gameDebug then
+    KeyboardHandler.ARROW = love.graphics.newImage('gfx/arrow_up_dbg.png')
+  end
+
   local self = setmetatable({}, KeyboardHandler)
   self.status = KeyboardHandler.PROCESSING
   self.dictionary = dictionary
@@ -96,47 +102,59 @@ function KeyboardHandler:direction()
 end
 
 function KeyboardHandler:draw(cursor)
-  if self.chosenWord then
-    self:drawWord(cursor, self.chosenWord)
-  else
-    for i=1,table.getn(self.words) do
+  image = KeyboardHandler.ARROW
+
+  local width, height = image:getWidth(), image:getHeight()
+  for i=1,table.getn(self.words) do
+    if gameDebug and i ~= KeyboardHandler.ONLYDRAW then
+      -- do nothing
+    else
       cursor:reset()
-      local xoff, yoff = 0, 0
       if i == KeyboardHandler.PUP then
-        yoff = 16
+        cursor:moveBy(0, -height/2)
+        drawImage(cursor, image, 0)
+        cursor:moveBy(0, -height/2)
       elseif i == KeyboardHandler.PDOWN then
-        yoff = -16
+        cursor:moveBy(0, height/2)
+        drawImage(cursor, image, 3.14159)
+        cursor:moveBy(0, height/2)
       elseif i == KeyboardHandler.PLEFT then
-        xoff = -46
+        cursor:moveBy(-width/2, 0)
+        drawImage(cursor, image, 3.14149 * 1.5)
+        cursor:moveBy(-width/2, 0)
       else
-        xoff = 46
+        cursor:moveBy(width/2, 0)
+        drawImage(cursor, image, 3.14159 / 2)
+        cursor:moveBy(width/2, 0)
       end
-      cursor:moveBy(xoff, yoff)
       self:drawWord(cursor, i)
+      cursor:draw()
     end
   end
+  cursor:reset()
+  cursor:draw({0xFF, 0, 0})
 end
 
 function KeyboardHandler:drawWord(cursor, i)
-  word = self.wordStrings[i]
-  font = love.graphics.getFont()
-  static = self.staticWords[i]
-  actual = self.words[i]
-  width = font:getWidth(word)
-  height = font:getHeight(word)
-  sidx, idx = 1, 1
+  local word = self.wordStrings[i]
+  local font = love.graphics.getFont()
+  local static = self.staticWords[i]
+  local actual = self.words[i]
+  local width = font:getWidth(word)
+  local height = font:getHeight(word)
+  local sidx, idx = 1, 1
   while static[sidx] ~= actual[idx] do
     sidx = sidx + 1
   end
-  drawPosition = cursor.x - (width / 2)
+  cursor:moveBy(-(width / 2), 0)
   if sidx ~= idx then
     love.graphics.setColor(0xFF, 0, 0)
     message = string.sub(word, 1, sidx - 1)
-    love.graphics.print(message, drawPosition, cursor.y)
-    drawPosition = drawPosition + font:getWidth(message)
+    love.graphics.print(message, cursor.x, cursor.y)
+    cursor:moveBy(font:getWidth(message), 0)
   end
   love.graphics.setColor(0xFF, 0xFF, 0xFF)
   message = string.sub(word, sidx)
-  love.graphics.print(message, drawPosition, cursor.y)
+  love.graphics.print(message, cursor.x, cursor.y)
   love.graphics.reset()
 end
