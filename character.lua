@@ -1,11 +1,13 @@
-Character = {MAX_HP = 100, MAX_FOCUS = 50, SCALE=1}
+Character = {MAX_HP = 5, MAX_FOCUS = 5, SCALE=1}
 Character.__index = Character
 
 function Character.NewCharacter(x, y, name, scale)
   local self = setmetatable({}, Character)
 
-  self.hp = Character.MAX_HP
-  self.focus = Character.MAX_FOCUS
+  self.current_hp = Character.MAX_HP
+  self.max_hp = Character.MAX_HP
+  self.current_focus = Character.MAX_FOCUS
+  self.max_focus = Character.MAX_FOCUS
   self.sprite = love.graphics.newImage("gfx/" .. name .. '.png')
   self.x = x
   self.y = y

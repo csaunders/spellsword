@@ -30,7 +30,13 @@ end
 function ModeSwitcher:handler()
   return self.modes[1]
 end
-  
+
+function ModeSwitcher:tick(response)
+end
+
+function ModeSwitcher:reset()
+  self:handler():reset()
+end
 
 function ModeSwitcher:nextMode()
   previousMode = table.remove(self.modes, 1)

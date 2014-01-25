@@ -3,12 +3,14 @@ require("character")
 require("word_queue")
 require("keyboard_handler")
 require("mode_switcher")
+require("status")
+require("cursor")
 
 gKeyPressed = {}
 gCamX,gCamY = 100,100
 character = nil
 words = nil
-handler = nil
+status = nil
 modeSwitcher = nil
 
 function love.load()
@@ -16,6 +18,8 @@ function love.load()
   TiledMap_Load("maps/basic.tmx", 16)
   love.graphics.setNewFont('fonts/manaspace.regular.ttf', 14)
   character = Character.NewCharacter(love.graphics.getWidth() / 2, love.graphics.getHeight() / 2, 'hero')
+  status = Status.NewStatus(0, love.graphics.getHeight(), character)
+
   prepareHandlers()
 end
 
@@ -26,7 +30,7 @@ end
 function love.keypressed(key, unicode)
   gKeyPressed[key] = true
   if (key == "escape") then os.exit(0) end
-  if (key == "=") then handler:setWords(words:grab()) end
+  if (key == "=") then modeSwitcher:reset() end
   response = modeSwitcher:handle(key)
   if response == KeyboardHandler.PROCESSING then
     return
@@ -42,17 +46,17 @@ end
 function tick(response)
   if response == KeyboardHandler.SUCCESS then
     gCamX, gCamY = character:move(handler():direction(), gCamX, gCamY)
-    handler():setWords(words:grab())
+    modeSwitcher:reset()
   elseif response == KeyboardHandler.FAILURE then
     character.injure('focus')
-    handler():setWords(words:grab())
+    modeSwitcher:reset()
   end
 end
 
 function prepareHandlers()
   words = WordQueue.NewQueue('basic_english')
-  movementHandler = KeyboardHandler.NewHandler(words:grab())
-  statusHandler = KeyboardHandler.NewHandler(words:grab())
+  movementHandler = KeyboardHandler.NewHandler(words)
+  statusHandler = KeyboardHandler.NewHandler(words)
   modeSwitcher = ModeSwitcher.NewModeSwitcher({movementHandler, statusHandler})
 end
 
@@ -68,6 +72,8 @@ function love.draw()
   love.graphics.setBackgroundColor(0x80, 0x80, 0x80)
   TiledMap_DrawNearCam(gCamX, gCamY)
   love.graphics.print('(' .. gCamX .. ',' .. gCamY .. ')', 50, 50)
-  handler():draw(character)
   character:draw()
+  status:draw()
+  cursor = Cursor.NewCursor(status:center())
+  handler():draw(cursor)
 end
