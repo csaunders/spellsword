@@ -42,10 +42,10 @@ end
 
 function Collider:withinBounds(character)
   if self:knownPointWithinBounds(character) then
-    return false
+    return true
   else
     local withinBounds = self:performBoundsCheck(character)
-    if not withinBounds then self:cacheBoundCheck(character) end
+    if withinBounds then self:cacheBoundCheck(character) end
     return withinBounds
   end
 end

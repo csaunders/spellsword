@@ -172,8 +172,8 @@ local function getObjects(node)
   local objects = {}
   for k, sub in ipairs(node) do
     if sub.label == 'objectgroup' then
+      local objgroup = {}
       for l, obj in ipairs(sub) do
-        local objgroup = {}
         if obj.label == "object" and obj.xarg.name then
           local object = {}
           object['x'] = tonumber(obj.xarg.x)

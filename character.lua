@@ -31,7 +31,7 @@ function Character:move(direction, x, y, collider)
   end
   if collider then
     local projx, projy = TiledMap_Project(dx, dy)
-    local newPosition = {['x'] = projx, ['y'] = projy}
+    local newPosition = {['x'] = dx, ['y'] = dy}
     if not collider:withinBounds(newPosition) then return x, y, false end
   end
   return dx, dy, true
