@@ -89,6 +89,11 @@ function handler()
 end
 
 function tick(response)
+  if extraTick then
+    extraTick = false
+    dungeonMaster:tick(KeyboardHandler.RESTING)
+  end
+
   if response == KeyboardHandler.PROCESSING then return end
 
   if response == KeyboardHandler.SUCCESS then
@@ -104,6 +109,7 @@ function tick(response)
   end
   modeSwitcher:reset()
   dungeonMaster:tick(response)
+  if character:unfocused() then extraTick = true end
 end
 
 function prepareHandlers()
