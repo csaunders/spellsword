@@ -9,6 +9,8 @@ require("cursor")
 require("collider")
 require("dungeon_master")
 
+require('splash_renderer')
+
 gKeyPressed = {}
 gCamX,gCamY = 100,100
 character = nil
@@ -21,10 +23,13 @@ collider = nil
 -- otherwise the collisions for monsters get all fucked up
 -- TODO: need to figure out WHY this is the way it is.
 adjustmentX, adjustmentY = 0, 0
+timer = nil
 
 function love.load()
-  if arg and arg[#arg] == "-debug" then require("mobdebug").start() end
+  --if arg and arg[#arg] == "-debug" then require("mobdebug").start() end
   if lovetest.detect(arg) then lovetest.run() end
+  
+  splash = SplashRenderer:NewSplash("Frank Face Games")
 
   local mapObjects = TiledMap_Load("maps/level0.tmx", 64)
   collider = Collider.NewCollider(mapObjects['Floor'])
@@ -39,6 +44,7 @@ function love.load()
 
   prepareHandlers()
   prepareDungeon(character, collider, gCamX, gCamY)
+  timer = 0
 end
 
 function love.keyreleased( key )
@@ -46,6 +52,7 @@ function love.keyreleased( key )
 end
 
 function love.keypressed(key, unicode)
+  if timer < 5.0 then return end
   gKeyPressed[key] = true
   if (key == "=") then modeSwitcher:reset() end
   if (key == "1" or key == "2" or key == "3" or key == "4") then return end
@@ -125,6 +132,7 @@ function prepareDungeon(character, collider, x, y)
 end
 
 function love.update(dt)
+  timer = timer + dt
   local s = 100*dt
   if(gKeyPressed['1']) then adjustmentX = adjustmentX - s end
   if(gKeyPressed['2']) then adjustmentX = adjustmentX + s end
@@ -144,4 +152,7 @@ function love.draw()
   character:draw()
   status:draw()
   handler():draw(status:center())
+  if(timer < 3.0) then
+    splash:draw()
+  end
 end
