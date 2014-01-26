@@ -23,6 +23,11 @@ function ModeSwitcher:handle(key)
   end
 end
 
+function ModeSwitcher:inflictsInjuries()
+  if self:handler().injureOnFailure == nil then return true end
+  return self.handler().injureOnFailure
+end
+
 function ModeSwitcher:getMode()
   return self:handler():name()
 end

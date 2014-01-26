@@ -16,7 +16,7 @@ function TiledMap_Load (filepath,tilesize,spritepath_removeold,spritepath_prefix
 	kTileSize = tilesize or 32
 	gTileGfx = {}
 	
-	local tiletype,layers = TiledMap_Parse(filepath)
+	local tiletype,layers, objects = TiledMap_Parse(filepath)
 	gMapLayers = layers
 	for first_gid,path in pairs(tiletype) do 
 		path = spritepath_prefix .. string.gsub(path,"^"..string.gsub(spritepath_removeold,"%.","%%."),"")
@@ -33,6 +33,7 @@ function TiledMap_Load (filepath,tilesize,spritepath_removeold,spritepath_prefix
 		end
 		end
 	end
+  return objects
 end
 
 function TiledMap_GetMapTile (tx,ty,layerid) -- coords in tiles
@@ -151,10 +152,51 @@ local function getLayers(node)
 	return layers
 end
 
+local function getProperties(node)
+  local properties = {}
+  for k, sub in ipairs(node) do
+    if sub.label == 'properties' then
+      for l, prop in ipairs(sub) do
+        properties[prop.xarg.name] = sub.xarg.value
+      end
+    end
+  end
+  return properties
+end
+
+local function getObjects(node)
+  local objects = {}
+  for k, sub in ipairs(node) do
+    if sub.label == 'objectgroup' then
+      for l, obj in ipairs(sub) do
+        local objgroup = {}
+        if obj.label == "object" and obj.xarg.name then
+          local object = {}
+          object['x'] = tonumber(obj.xarg.x)
+          object['y'] = tonumber(obj.xarg.y)
+          object['width'] = tonumber(obj.xarg.width)
+          object['height'] = tonumber(obj.xarg.height)
+          object['points'] = {
+            {['x'] = object.x, ['y'] = object.y},
+            {['x'] = object.x + object.width, ['y'] = object.y},
+            {['x'] = object.x, ['y'] = object.y + object.height},
+            {['x'] = object.x + object.width, ['y'] = object.y + object.height}
+          }
+          object['properties'] = getProperties(obj)
+          objgroup[obj.xarg.name] = object
+        end
+        objects[sub.xarg.name] = objgroup
+      end
+    end
+  end
+  return objects
+end
+
 function TiledMap_Parse(filename)
 	local xml = LoadXML(love.filesystem.read(filename))
 	local tiles = getTilesets(xml[2])
 	local layers = getLayers(xml[2])
-	return tiles, layers
+  local objects = getObjects(xml[2])
+	return tiles, layers, objects
 end
 

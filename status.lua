@@ -24,7 +24,9 @@ end
 function Status:center()
   self.center_x = self.center_x or (self.x + (self.background:getWidth() / 2))
   self.center_y = self.center_y or (self.y + (self.background:getHeight() / 2))
-  return self.center_x, self.center_y
+  self.center_cursor = self.center_cursor or Cursor.NewCursor(self.center_x, self.center_y)
+  self.center_cursor:reset()
+  return self.center_cursor
 end
 
 function Status:draw()

@@ -12,7 +12,7 @@ KeyboardHandler = {
 
 KeyboardHandler.__index = KeyboardHandler
 
-function KeyboardHandler.NewHandler(dictionary, words)
+function KeyboardHandler.NewHandler(dictionary, words, injureOnFailure)
   if gameDebug then
     KeyboardHandler.ARROW = love.graphics.newImage('gfx/arrow_up_dbg.png')
   end
@@ -20,6 +20,7 @@ function KeyboardHandler.NewHandler(dictionary, words)
   local self = setmetatable({}, KeyboardHandler)
   self.status = KeyboardHandler.PROCESSING
   self.dictionary = dictionary
+  self.injureOnFailure = injureOnFailure
   self:setWords(words or dictionary:grab())
 
   return self
@@ -133,7 +134,7 @@ function KeyboardHandler:draw(cursor)
     end
   end
   cursor:reset()
-  cursor:draw({0xFF, 0, 0})
+  -- cursor:draw({0xFF, 0, 0})
 end
 
 function KeyboardHandler:drawWord(cursor, i)

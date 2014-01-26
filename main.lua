@@ -1,4 +1,5 @@
 love.filesystem.load("tiledmap.lua")()
+local lovetest = require("test/lovetest")
 require("character")
 require("word_queue")
 require("keyboard_handler")
@@ -13,11 +14,17 @@ words = nil
 status = nil
 modeSwitcher = nil
 gameDebug = false
+mapObjects = nil
 
 function love.load()
   if arg and arg[#arg] == "-debug" then require("mobdebug").start() end
-  TiledMap_Load("maps/basic.tmx", 16)
+  if lovetest.detect(arg) then lovetest.run() end
+
+  mapObjects = TiledMap_Load("maps/level0.tmx", 64)
   love.graphics.setNewFont('fonts/manaspace.regular.ttf', 14)
+  startingPoint = mapObjects['Setup']['StartingPoint']
+  gCamX = startingPoint['x']
+  gCamY = startingPoint['y']
   character = Character.NewCharacter(love.graphics.getWidth() / 2, love.graphics.getHeight() / 2, 'hero')
   status = Status.NewStatus(0, love.graphics.getHeight(), character)
 
@@ -68,13 +75,14 @@ function handler()
 end
 
 function tick(response)
+  if response == KeyboardHandler.PROCESSING then return end
+
   if response == KeyboardHandler.SUCCESS then
     gCamX, gCamY = character:move(handler():direction(), gCamX, gCamY)
-    modeSwitcher:reset()
-  elseif response == KeyboardHandler.FAILURE then
+  elseif response == KeyboardHandler.FAILURE and modeSwitcher:inflictsInjuries() then
     character:injure('focus')
-    modeSwitcher:reset()
   end
+  modeSwitcher:reset()
 end
 
 function prepareHandlers()
@@ -95,9 +103,7 @@ end
 function love.draw()
   love.graphics.setBackgroundColor(0x80, 0x80, 0x80)
   TiledMap_DrawNearCam(gCamX, gCamY)
-  love.graphics.print('(' .. gCamX .. ',' .. gCamY .. ')', 50, 50)
   character:draw()
   status:draw()
-  cursor = Cursor.NewCursor(status:center())
-  handler():draw(cursor)
+  handler():draw(status:center())
 end
