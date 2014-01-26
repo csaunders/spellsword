@@ -16,7 +16,7 @@ function ModeSwitcher:insertHandler(handler)
 end
 
 function ModeSwitcher:handle(key)
-  if key == " " then
+  if key == "escape" then
     return self:nextMode()
   else
     return self:handler():handle(key)

@@ -4,5 +4,7 @@ manaspace-regular.ttf -- codeman38 -- http://www.1001fonts.com/manaspace-font.ht
 SleekBars.png -- Jannax -- http://opengameart.org/content/sleek-bars
 gruntsound.wav -- n3b -- http://opengameart.org/content/grunt
 yelling_sounds.zip -- HaelDB -- http://opengameart.org/content/male-gruntyelling-sounds
+Spell Sounds Starter Pack -- p0ss -- http://opengameart.org/content/spell-sounds-starter-pack
+3 Heal Spells -- DoKashiteru -- http://opengameart.org/content/3-heal-spells
 RPG sound pack -- artisticdude -- http://opengameart.org/content/rpg-sound-pack
 Audacity -- The Audacity Devs -- http://audacity.sourceforge.net/

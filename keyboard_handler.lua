@@ -6,6 +6,7 @@ KeyboardHandler = {
   SUCCESS = 5,
   FAILURE = 6,
   PROCESSING = 7,
+  RESTING = 8,
   ARROW = love.graphics.newImage('gfx/arrow_up.png'),
   ONLYDRAW = 4,
   GRUNTS = {
@@ -24,7 +25,7 @@ function KeyboardHandler.NewHandler(dictionary, words, injureOnFailure)
   end
 
   local self = setmetatable({}, KeyboardHandler)
-  self.errorCount = 0
+  self.errorCount = 1
   self.status = KeyboardHandler.PROCESSING
   self.dictionary = dictionary
   self.injureOnFailure = injureOnFailure
@@ -63,6 +64,7 @@ function KeyboardHandler:getWord(position)
 end
 
 function KeyboardHandler:handle(key)
+  if key == " " then return KeyboardHandler.RESTING end
   if self.chosenWord == nil then
     for i=1,table.getn(self.words) do
       if self.words[i][1] == key then

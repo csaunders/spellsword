@@ -9,6 +9,8 @@ function Character.NewCharacter(x, y, name, scale)
   self.current_focus = Character.MAX_FOCUS
   self.max_focus = Character.MAX_FOCUS
   self.sprite = love.graphics.newImage("gfx/" .. name .. '.png')
+  self.injurySound = love.audio.newSource("audio/fx/" .. name .. "injure.ogg", 'static')
+  self.deathSound = love.audio.newSource("audio/fx/" .. name .. "die.ogg", 'static')
   self:setPosition(x, y)
   self:setDrawPosition(x, y)
   self.adjustmentX = 0
@@ -29,8 +31,8 @@ function Character:setHp(current, max)
 end
 
 function Character:setFocus(current, max)
-  self.current_hp = current or self.current_hp
-  self.max_hp = max or self.max_hp
+  self.current_focus = current or self.current_focus
+  self.max_focus = max or self.max_focus
   self:correctDiscrepancies()
 end
 
@@ -41,6 +43,18 @@ function Character:correctDiscrepancies()
   if self.current_focus > self.max_focus then
     self.current_focus = self.max_focus
   end
+end
+
+function Character:injuredHp()
+  return self.current_hp < self.max_hp
+end
+
+function Character:injuredFocus()
+  return self.current_focus < self.max_focus
+end
+
+function Character:injured()
+  return self:injuredHp() or self:injuredFocus()
 end
 
 function Character:unfocused()
@@ -92,12 +106,63 @@ end
 function Character:injure(attribute)
   if attribute == "health" then
     self.current_hp = self.current_hp - 1
+    if self:dead() then
+      self.deathSound:play()
+    else
+      self.injurySound:play()
+    end
   elseif attribute == "focus" then
     self.current_focus = self.current_focus - 1
   end
 end
 
+function Character:heal(attribute, amount)
+  amount = amount or 1
+  if attribute == "health" then
+    self.current_hp = self.current_hp + amount
+  elseif attribute == "focus" then
+    self.current_focus = self.current_focus + amount
+  end
+  self:correctDiscrepancies()
+end
+
+function Character:healRandom(amount)
+  attrs = {}
+  if self:injuredHp() then table.insert(attrs, 'health') end
+  if self:injuredFocus() then table.insert(attrs, 'focus') end
+  attribute = attrs[math.random(table.getn(attrs))]
+  self:heal(attribute, amount)
+end
+
+function Character:center()
+  return (self.drawX or self.x) + self.height/2, (self.drawY or self.y) + self.width/2
+end
+
+function Character:radius()
+  if self.height > self.width then
+    return self.height * self.height
+  else
+    return self.width * self.height
+  end
+end
+
+function Character:attack(other)
+  other:injure('health')
+end
+
+function Character:isBeside(other)
+  local cx, cy = self:center()
+  local ocx, ocy = other:center()
+  local a = math.abs(ocy - cy)
+  local b  = math.abs(ocx - cx)
+  local radius = (a * a) + (b * b)
+  local delta = (3.14159*2*self:radius()) - (3.14159*2*radius)
+  return delta > 0
+end
+
 function Character:draw()
   love.graphics.draw(self.sprite, self.drawX, self.drawY, 0, self.scale, self.scale)
-  love.graphics.circle('fill', self.drawX, self.drawY, 2)
+  -- love.graphics.circle('fill', self.drawX, self.drawY, 2)
+  -- local cx, cy = self:center()
+  -- love.graphics.circle('fill', cx, cy, 2)
 end
