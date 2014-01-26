@@ -71,6 +71,7 @@ function DungeonMaster:tick(response, direction)
     end
   end
   if response == KeyboardHandler.RESTING and self.character:injured() then self:rollForHeals(self.character) end
+  self:rollForMonsters()
   self:monsterProcess(mover)
   self:cullDeadMonsters(deadMonsters)
 end
@@ -91,6 +92,12 @@ end
 function DungeonMaster:monsterProcess(f)
   for i, monster in ipairs(self.monsters) do
     f(monster)
+  end
+end
+
+function DungeonMaster:rollForMonsters()
+  if math.random(15) <= 2 then
+    self:spawnNewMonster()
   end
 end
 
