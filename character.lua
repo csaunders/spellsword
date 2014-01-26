@@ -1,4 +1,4 @@
-Character = {MAX_HP = 5, MAX_FOCUS = 5, SCALE=1}
+Character = {MAX_HP = 5, MAX_FOCUS = 5, SCALE=1, COUNTER=0}
 Character.__index = Character
 
 function Character.NewCharacter(x, y, name, scale)
@@ -9,11 +9,15 @@ function Character.NewCharacter(x, y, name, scale)
   self.current_focus = Character.MAX_FOCUS
   self.max_focus = Character.MAX_FOCUS
   self.sprite = love.graphics.newImage("gfx/" .. name .. '.png')
-  self.x = x
-  self.y = y
+  self:setPosition(x, y)
+  self:setDrawPosition(x, y)
+  self.adjustmentX = 0
+  self.adjustmentY = 0
   self.scale = scale or Character.SCALE
   self.width = self.scale * self.sprite:getWidth()
   self.height = self.scale * self.sprite:getHeight()
+  self.name = name .. Character.COUNTER
+  Character.COUNTER = Character.COUNTER + 1
 
   return self
 end
@@ -59,16 +63,30 @@ function Character:move(direction, x, y, collider)
     dx = dx + self.width
   end
   if collider then
-    local projx, projy = TiledMap_Project(dx, dy)
-    local newPosition = {['x'] = dx, ['y'] = dy}
+    local newPosition = {
+      ['x'] = dx, ['y'] = dy,
+      ['name'] = self.name,
+      ['adjustmentX'] = self.adjustmentX or 0,
+      ['adjustmentY'] = self.adjustmentY or 0
+    }
     if not collider:withinBounds(newPosition) then return x, y, false end
   end
   return dx, dy, true
 end
 
 function Character:setPosition(x, y)
-  self.x = x
-  self.y = y
+  local oldX, oldY = (self.x or x), (self.y or y)
+  self:applyDelta(x-oldX, y - oldY)
+  self.x, self.y = x, y
+end
+
+function Character:setDrawPosition(x, y)
+  self.drawX, self.drawY = x, y
+end
+
+function Character:applyDelta(dx, dy)
+  self.drawX = (self.drawX or 0) + (dx or 0)
+  self.drawY = (self.drawY or 0) + (dy or 0)
 end
 
 function Character:injure(attribute)
@@ -80,5 +98,6 @@ function Character:injure(attribute)
 end
 
 function Character:draw()
-  love.graphics.draw(self.sprite, self.x, self.y, 0, self.scale, self.scale)
+  love.graphics.draw(self.sprite, self.drawX, self.drawY, 0, self.scale, self.scale)
+  love.graphics.circle('fill', self.drawX, self.drawY, 2)
 end

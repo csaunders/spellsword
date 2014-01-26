@@ -161,7 +161,7 @@ local function getProperties(node)
   for k, sub in ipairs(node) do
     if sub.label == 'properties' then
       for l, prop in ipairs(sub) do
-        properties[prop.xarg.name] = sub.xarg.value
+        properties[prop.xarg.name] = prop.xarg.value
       end
     end
   end

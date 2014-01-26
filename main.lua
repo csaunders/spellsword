@@ -18,6 +18,9 @@ modeSwitcher = nil
 gameDebug = false
 dungeonMaster = nil
 collider = nil
+-- otherwise the collisions for monsters get all fucked up
+-- TODO: need to figure out WHY this is the way it is.
+adjustmentX, adjustmentY = 0, 0
 
 function love.load()
   if arg and arg[#arg] == "-debug" then require("mobdebug").start() end
@@ -29,6 +32,8 @@ function love.load()
   startingPoint = mapObjects['Setup']['StartingPoint']
   gCamX = startingPoint['x']
   gCamY = startingPoint['y']
+  adjustmentX = tonumber(startingPoint.properties.adjustX)
+  adjustmentY = tonumber(startingPoint.properties.adjustY)
   character = Character.NewCharacter(love.graphics.getWidth() / 2, love.graphics.getHeight() / 2, 'hero')
   status = Status.NewStatus(0, love.graphics.getHeight(), character)
 
@@ -44,7 +49,11 @@ function love.keypressed(key, unicode)
   gKeyPressed[key] = true
   if (key == "escape") then os.exit(0) end
   if (key == "=") then modeSwitcher:reset() end
-  if (key == "up" or key == "down" or key == "left" or key == "right") then return end
+  if (key == "1" or key == "2" or key == "3" or key == "4") then return end
+  if (key == "up" or key == "down" or key == "left" or key == "right") then
+    dungeonMaster:tick(KeyboardHandler.SUCCESS, key)
+    return
+  end
   response = modeSwitcher:handle(key)
   if response == KeyboardHandler.PROCESSING then
     return
@@ -84,7 +93,9 @@ function tick(response)
   if response == KeyboardHandler.PROCESSING then return end
 
   if response == KeyboardHandler.SUCCESS then
-    gCamX, gCamY, success = character:move(handler():direction(), gCamX, gCamY, collider)
+    local updatedX, updatedY, success = character:move(handler():direction(), gCamX, gCamY, collider)
+    dungeonMaster:updateMonsterPositions(gCamX-updatedX, gCamY-updatedY)
+    gCamX, gCamY = updatedX, updatedY
     if not success then print("could not move that way!") end
   elseif response == KeyboardHandler.FAILURE and modeSwitcher:inflictsInjuries() then
     character:injure('focus')
@@ -106,16 +117,21 @@ function prepareDungeon(character, collider, x, y)
 end
 
 function love.update(dt)
-  local s = 500*dt
-  if(gKeyPressed.up) then gCamY = gCamY - s end
-  if(gKeyPressed.down) then gCamY = gCamY + s end
-  if(gKeyPressed.left) then gCamX = gCamX - s end
-  if(gKeyPressed.right) then gCamX = gCamX + s end
+  local s = 100*dt
+  if(gKeyPressed['1']) then adjustmentX = adjustmentX - s end
+  if(gKeyPressed['2']) then adjustmentX = adjustmentX + s end
+  if(gKeyPressed['3']) then adjustmentY = adjustmentY - s end
+  if(gKeyPressed['4']) then adjustmentY = adjustmentY + s end
+  -- if(gKeyPressed.up) then gCamY = gCamY - s end
+  -- if(gKeyPressed.down) then gCamY = gCamY + s end
+  -- if(gKeyPressed.left) then gCamX = gCamX - s end
+  -- if(gKeyPressed.right) then gCamX = gCamX + s end
 end
 
 function love.draw()
   love.graphics.setBackgroundColor(0x80, 0x80, 0x80)
   TiledMap_DrawNearCam(gCamX, gCamY)
+  --collider:draw(gCamX, gCamY)
   character:draw()
   status:draw()
   handler():draw(status:center())

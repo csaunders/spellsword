@@ -25,6 +25,8 @@ function DungeonMaster:spawnNewMonster()
       local startX = self.x + xMult*deltaX
       local startY = self.y + yMult*deltaY
       local monster = Monsters.gooBall(startX, startY)
+      monster.adjustmentX = adjustmentX
+      monster.adjustmentY = adjustmentY
       if self.collider:withinBounds(monster) then
         self:addMonster(monster)
         return
@@ -37,14 +39,21 @@ function DungeonMaster:addMonster(monster)
   table.insert(self.monsters, monster)
 end
 
+function DungeonMaster:updateMonsterPositions(dx, dy)
+  updater = function(monster)
+    monster:applyDelta(dx, dy)
+  end
+  self:monsterProcess(updater)
+end
+
 function DungeonMaster:genMult()
   if math.random(2) == 2 then return 1 else return -1 end
 end
 
-function DungeonMaster:tick(response)
+function DungeonMaster:tick(response, direction)
   if Response == KeyboardHandler.PROCESSING then return end
   mover = function(monster)
-    local x, y = monster:move(self:determineDirection(), monster.x, monster.y, self.collider)
+    local x, y = monster:move(direction or self:determineDirection(), monster.x, monster.y, self.collider)
     monster:setPosition(x, y)
   end
   self:monsterProcess(mover)
@@ -66,6 +75,5 @@ end
 function DungeonMaster:determineDirection()
   local index = math.random(table.getn(DungeonMaster.DIRECTIONS))
   local direction = DungeonMaster.DIRECTIONS[index]
-  print(direction)
   return direction
 end

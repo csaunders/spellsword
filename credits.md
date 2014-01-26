@@ -5,3 +5,4 @@ SleekBars.png -- Jannax -- http://opengameart.org/content/sleek-bars
 gruntsound.wav -- n3b -- http://opengameart.org/content/grunt
 yelling_sounds.zip -- HaelDB -- http://opengameart.org/content/male-gruntyelling-sounds
 RPG sound pack -- artisticdude -- http://opengameart.org/content/rpg-sound-pack
+Audacity -- The Audacity Devs -- http://audacity.sourceforge.net/

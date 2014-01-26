@@ -125021,6 +125021,11 @@
   <object name="Chest" x="1345" y="707" width="64" height="65"/>
  </objectgroup>
  <objectgroup name="Setup" width="250" height="250">
-  <object name="StartingPoint" x="683" y="301" width="3" height="5"/>
+  <object name="StartingPoint" x="683" y="301" width="3" height="5">
+   <properties>
+    <property name="adjustX" value="-110"/>
+    <property name="adjustY" value="143"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>
