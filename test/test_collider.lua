@@ -28,5 +28,15 @@ end
 function test_point_caching()
   collider, character = setup(17, 13)
   assert_equal(false, collider:withinBounds(character))
-  assert_equal(true, collider:knownPointOutOfBounds(character))
+  assert_equal(true, collider:knownPointWithinBounds(character))
+end
+
+function test_collisions_with_multiple_binding_boxes()
+  collider, character = setup(17, 13)
+  otherRect = {
+    ['x'] = 15, ['y'] = 13,
+    ['width'] = 5, ['height'] = 5
+  }
+  collider:addObject(otherRect)
+  assert_equal(true, collider:withinBounds(character))
 end

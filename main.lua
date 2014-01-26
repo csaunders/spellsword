@@ -6,6 +6,7 @@ require("keyboard_handler")
 require("mode_switcher")
 require("status")
 require("cursor")
+require("collider")
 
 gKeyPressed = {}
 gCamX,gCamY = 100,100
@@ -14,13 +15,14 @@ words = nil
 status = nil
 modeSwitcher = nil
 gameDebug = false
-mapObjects = nil
+collider = nil
 
 function love.load()
   if arg and arg[#arg] == "-debug" then require("mobdebug").start() end
   if lovetest.detect(arg) then lovetest.run() end
 
-  mapObjects = TiledMap_Load("maps/level0.tmx", 64)
+  local mapObjects = TiledMap_Load("maps/level0.tmx", 64)
+  collider = Collider.NewCollider(mapObjects['Floor'])
   love.graphics.setNewFont('fonts/manaspace.regular.ttf', 14)
   startingPoint = mapObjects['Setup']['StartingPoint']
   gCamX = startingPoint['x']
@@ -78,7 +80,8 @@ function tick(response)
   if response == KeyboardHandler.PROCESSING then return end
 
   if response == KeyboardHandler.SUCCESS then
-    gCamX, gCamY = character:move(handler():direction(), gCamX, gCamY)
+    gCamX, gCamY, success = character:move(handler():direction(), gCamX, gCamY, collider)
+    if not success then print("could not move that way!") end
   elseif response == KeyboardHandler.FAILURE and modeSwitcher:inflictsInjuries() then
     character:injure('focus')
   end

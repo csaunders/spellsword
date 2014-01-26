@@ -41,6 +41,10 @@ function TiledMap_GetMapTile (tx,ty,layerid) -- coords in tiles
 	return row and row[tx] or kMapTileTypeEmpty
 end
 
+function TiledMap_Project(camx, camy) -- convert camera coordinates to tile coordinates
+  return camx * kTileSize, camy * kTileSize
+end
+
 function TiledMap_DrawNearCam (camx,camy)
 	camx,camy = floor(camx),floor(camy)
 	local screen_w = love.graphics.getWidth()
@@ -176,13 +180,8 @@ local function getObjects(node)
           object['y'] = tonumber(obj.xarg.y)
           object['width'] = tonumber(obj.xarg.width)
           object['height'] = tonumber(obj.xarg.height)
-          object['points'] = {
-            {['x'] = object.x, ['y'] = object.y},
-            {['x'] = object.x + object.width, ['y'] = object.y},
-            {['x'] = object.x, ['y'] = object.y + object.height},
-            {['x'] = object.x + object.width, ['y'] = object.y + object.height}
-          }
           object['properties'] = getProperties(obj)
+          table.insert(objgroup, object)
           objgroup[obj.xarg.name] = object
         end
         objects[sub.xarg.name] = objgroup

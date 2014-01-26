@@ -18,17 +18,23 @@ function Character.NewCharacter(x, y, name, scale)
   return self
 end
 
-function Character:move(direction, x, y)
+function Character:move(direction, x, y, collider)
+  local dx, dy = x, y
   if direction == "up" then
-    y = y - self.height
+    dy = y - self.height
   elseif direction == "down" then
-    y = y + self.height
+    dy = y + self.height
   elseif direction == "left" then
-    x = x - self.width
+    dx = x - self.width
   elseif direction == "right" then
-    x = x + self.width
+    dx = x + self.width
   end
-  return x, y
+  if collider then
+    local projx, projy = TiledMap_Project(dx, dy)
+    local newPosition = {['x'] = projx, ['y'] = projy}
+    if not collider:withinBounds(newPosition) then return x, y, false end
+  end
+  return dx, dy, true
 end
 
 function Character:injure(attribute)

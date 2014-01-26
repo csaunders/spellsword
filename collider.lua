@@ -13,23 +13,27 @@ function Collider:cacheBoundCheck(character)
   self.outsideBounds[self:cacheKey(character)] = true
 end
 
+function Collider:addObject(object)
+  table.insert(self.objects, object)
+end
+
 function Collider:cacheKey(character)
   return character.x .. 'x' .. character.y
 end
 
-function Collider:knownPointOutOfBounds(character)
+function Collider:knownPointWithinBounds(character)
   return self.outsideBounds[self:cacheKey(character)]
 end
 
 function Collider:performBoundsCheck(character)
-  local within = true
+  local within = false
   for i, bound in ipairs(self.objects) do
     local normalizedX = character.x - bound.x
     local normalizedY = character.y - bound.y
 
-    if normalizedX > bound.width or normalizedY > bound.height then
+    if normalizedX >= 0 and normalizedY >= 0 and normalizedX <= bound.width and normalizedY <= bound.height then
       self:cacheBoundCheck(character)
-      within = false
+      within = true
       break
     end
   end
@@ -37,7 +41,7 @@ function Collider:performBoundsCheck(character)
 end
 
 function Collider:withinBounds(character)
-  if self:knownPointOutOfBounds(character) then
+  if self:knownPointWithinBounds(character) then
     return false
   else
     local withinBounds = self:performBoundsCheck(character)
