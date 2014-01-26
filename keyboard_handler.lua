@@ -7,7 +7,13 @@ KeyboardHandler = {
   FAILURE = 6,
   PROCESSING = 7,
   ARROW = love.graphics.newImage('gfx/arrow_up.png'),
-  ONLYDRAW = 4
+  ONLYDRAW = 4,
+  GRUNTS = {
+    love.audio.newSource('audio/fx/grunt1.ogg', 'static'),
+    love.audio.newSource('audio/fx/grunt2.ogg', 'static'),
+    love.audio.newSource('audio/fx/grunt3.ogg', 'static')
+  },
+  MAX_ERRORS = 3
 }
 
 KeyboardHandler.__index = KeyboardHandler
@@ -18,6 +24,7 @@ function KeyboardHandler.NewHandler(dictionary, words, injureOnFailure)
   end
 
   local self = setmetatable({}, KeyboardHandler)
+  self.errorCount = 0
   self.status = KeyboardHandler.PROCESSING
   self.dictionary = dictionary
   self.injureOnFailure = injureOnFailure
@@ -68,19 +75,24 @@ function KeyboardHandler:handle(key)
 end
 
 function KeyboardHandler:handleChosenWord(key)
-  if self.chosenWord == nil then
+  if self.chosenWord == nil and not self:withinErrorThreshold() then
+    self.errorCount = 0
     return KeyboardHandler.FAILURE
   end
 
   word = self.words[self.chosenWord]
 
-  if word[1] == key then
+  if word and word[1] == key then
+    self.errorCount = 0
     table.remove(word, 1)
+  elseif self:withinErrorThreshold() then
+    self:playGrunt()
   else
+    self.errorCount = 0
     return KeyboardHandler.FAILURE
   end
 
-  if table.getn(word) == 0 then
+  if word and table.getn(word) == 0 then
     return KeyboardHandler.SUCCESS
   else
     return KeyboardHandler.PROCESSING
@@ -172,4 +184,15 @@ function KeyboardHandler:compensateForLocation(word, cursor, i, font)
   else
     cursor:moveBy(font:getWidth(word)/2, 0)
   end
+end
+
+function KeyboardHandler:withinErrorThreshold()
+  return self.errorCount < KeyboardHandler.MAX_ERRORS
+end
+
+function KeyboardHandler:playGrunt()
+  self.errorCount = self.errorCount + 1
+  print(self.errorCount)
+  local index = math.random(table.getn(KeyboardHandler.GRUNTS))
+  KeyboardHandler.GRUNTS[index]:play()
 end

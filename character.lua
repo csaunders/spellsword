@@ -18,16 +18,45 @@ function Character.NewCharacter(x, y, name, scale)
   return self
 end
 
+function Character:setHp(current, max)
+  self.current_hp = current or self.current_hp
+  self.max_hp = max or self.max_hp
+  self:correctDiscrepancies()
+end
+
+function Character:setFocus(current, max)
+  self.current_hp = current or self.current_hp
+  self.max_hp = max or self.max_hp
+  self:correctDiscrepancies()
+end
+
+function Character:correctDiscrepancies()
+  if self.current_hp > self.max_hp then
+    self.current_hp = self.max_hp
+  end
+  if self.current_focus > self.max_focus then
+    self.current_focus = self.max_focus
+  end
+end
+
+function Character:unfocused()
+  return self.current_focus <= 0
+end
+
+function Character:dead()
+  return self.current_hp <= 0
+end
+
 function Character:move(direction, x, y, collider)
-  local dx, dy = x, y
+  local dx, dy = x or self.x, y or self.y
   if direction == "up" then
-    dy = y - self.height
+    dy = dy - self.height
   elseif direction == "down" then
-    dy = y + self.height
+    dy = dy + self.height
   elseif direction == "left" then
-    dx = x - self.width
+    dx = dx - self.width
   elseif direction == "right" then
-    dx = x + self.width
+    dx = dx + self.width
   end
   if collider then
     local projx, projy = TiledMap_Project(dx, dy)
@@ -35,6 +64,11 @@ function Character:move(direction, x, y, collider)
     if not collider:withinBounds(newPosition) then return x, y, false end
   end
   return dx, dy, true
+end
+
+function Character:setPosition(x, y)
+  self.x = x
+  self.y = y
 end
 
 function Character:injure(attribute)

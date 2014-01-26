@@ -7,6 +7,7 @@ require("mode_switcher")
 require("status")
 require("cursor")
 require("collider")
+require("dungeon_master")
 
 gKeyPressed = {}
 gCamX,gCamY = 100,100
@@ -15,6 +16,7 @@ words = nil
 status = nil
 modeSwitcher = nil
 gameDebug = false
+dungeonMaster = nil
 collider = nil
 
 function love.load()
@@ -31,6 +33,7 @@ function love.load()
   status = Status.NewStatus(0, love.graphics.getHeight(), character)
 
   prepareHandlers()
+  prepareDungeon(character, collider, gCamX, gCamY)
 end
 
 function love.keyreleased( key )
@@ -41,6 +44,7 @@ function love.keypressed(key, unicode)
   gKeyPressed[key] = true
   if (key == "escape") then os.exit(0) end
   if (key == "=") then modeSwitcher:reset() end
+  if (key == "up" or key == "down" or key == "left" or key == "right") then return end
   response = modeSwitcher:handle(key)
   if response == KeyboardHandler.PROCESSING then
     return
@@ -86,6 +90,7 @@ function tick(response)
     character:injure('focus')
   end
   modeSwitcher:reset()
+  dungeonMaster:tick(response)
 end
 
 function prepareHandlers()
@@ -93,6 +98,11 @@ function prepareHandlers()
   movementHandler = KeyboardHandler.NewHandler(words)
   statusHandler = KeyboardHandler.NewHandler(words)
   modeSwitcher = ModeSwitcher.NewModeSwitcher({movementHandler, statusHandler})
+end
+
+function prepareDungeon(character, collider, x, y)
+  dungeonMaster = DungeonMaster.NewMaster(character, collider, x, y)
+  dungeonMaster:spawnNewMonster()
 end
 
 function love.update(dt)
@@ -109,4 +119,5 @@ function love.draw()
   character:draw()
   status:draw()
   handler():draw(status:center())
+  dungeonMaster:draw()
 end
