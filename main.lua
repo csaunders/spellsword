@@ -1,5 +1,6 @@
 love.filesystem.load("tiledmap.lua")()
 local lovetest = require("test/lovetest")
+--local ProFi = require('ProFi')
 require("character")
 require("word_queue")
 require("keyboard_handler")
@@ -8,7 +9,6 @@ require("status")
 require("cursor")
 require("collider")
 require("dungeon_master")
-
 require('splash_renderer')
 
 gKeyPressed = {}
@@ -26,7 +26,8 @@ adjustmentX, adjustmentY = 0, 0
 timer = nil
 
 function love.load()
-  if arg and arg[#arg] == "-debug" then require("mobdebug").start() end
+  --ProFi:start()
+  --if arg and arg[#arg] == "-debug" then require("mobdebug").start() end
   if lovetest.detect(arg) then lovetest.run() end
   
   splash = SplashRenderer:NewSplash("Frank Face Games")
@@ -54,6 +55,10 @@ end
 function love.keypressed(key, unicode)
   if timer < 5.0 then return end
   gKeyPressed[key] = true
+  if (key == "escape") then
+    --ProFi:stop()
+    --ProFi:writeReport('ProfileResults.txt')
+  end
   if (key == "=") then modeSwitcher:reset() end
   if (key == "1" or key == "2" or key == "3" or key == "4") then return end
   if (key == "up" or key == "down" or key == "left" or key == "right") then
@@ -142,6 +147,7 @@ function love.update(dt)
   -- if(gKeyPressed.down) then gCamY = gCamY + s end
   -- if(gKeyPressed.left) then gCamX = gCamX - s end
   -- if(gKeyPressed.right) then gCamX = gCamX + s end
+  collectgarbage('collect') -- "Fixes" memory leak
 end
 
 function love.draw()
@@ -154,5 +160,7 @@ function love.draw()
   handler():draw(status:center())
   if(timer < 3.0) then
     splash:draw()
+  elseif timer > 3.0 and splash ~= nil then
+    splash = nil
   end
 end
