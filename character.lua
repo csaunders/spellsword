@@ -1,4 +1,18 @@
 Character = {MAX_HP = 5, MAX_FOCUS = 5, SCALE=1, COUNTER=0}
+Character.Sprites = {
+  ['hero'] = love.graphics.newImage('gfx/hero.png'),
+  ['gooball'] = love.graphics.newImage('gfx/gooball.png')
+}
+Character.Fx = {
+  ['hero'] = {
+    ['injure'] = love.audio.newSource('audio/fx/heroinjure.ogg', 'static'),
+    ['die'] = love.audio.newSource('audio/fx/herodie.ogg', 'static')
+  },
+  ['gooball'] = {
+    ['injure'] = love.audio.newSource('audio/fx/gooballinjure.ogg', 'static'),
+    ['die'] = love.audio.newSource('audio/fx/gooballdie.ogg', 'static')
+  }
+}
 Character.__index = Character
 
 function Character.NewCharacter(x, y, name, scale)
@@ -8,9 +22,9 @@ function Character.NewCharacter(x, y, name, scale)
   self.max_hp = Character.MAX_HP
   self.current_focus = Character.MAX_FOCUS
   self.max_focus = Character.MAX_FOCUS
-  self.sprite = love.graphics.newImage("gfx/" .. name .. '.png')
-  self.injurySound = love.audio.newSource("audio/fx/" .. name .. "injure.ogg", 'static')
-  self.deathSound = love.audio.newSource("audio/fx/" .. name .. "die.ogg", 'static')
+  self.sprite = Character.Sprites[name]
+  self.injurySound = Character.Fx[name]['injure']
+  self.deathSound = Character.Fx[name]['die']
   self:setPosition(x, y)
   self:setDrawPosition(x, y)
   self.adjustmentX = 0

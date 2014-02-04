@@ -6,15 +6,15 @@ Status = {
   FULLHP = love.graphics.newImage('gfx/full_heart.png'),
   MISSHP = love.graphics.newImage('gfx/empty_heart.png'),
   FULLFOC = love.graphics.newImage('gfx/focus_full.png'),
-  MISSFOC = love.graphics.newImage('gfx/focus_empty.png')
+  MISSFOC = love.graphics.newImage('gfx/focus_empty.png'),
+  BACKGROUND = love.graphics.newImage("gfx/statusbox.png")
 }
 Status.__index = Status
 
 function Status.NewStatus(x, y, character)
   local self = setmetatable({}, Status)
-  self.background = love.graphics.newImage("gfx/statusbox.png")
   self.x = x
-  self.y = y - self.background:getHeight()
+  self.y = y - Status.BACKGROUND:getHeight()
   self.cursor = Cursor.NewCursor(self.x + Status.PADDING_X, self.y + Status.PADDING_Y)
   self.character = character
 
@@ -22,15 +22,15 @@ function Status.NewStatus(x, y, character)
 end
 
 function Status:center()
-  self.center_x = self.center_x or (self.x + (self.background:getWidth() / 2))
-  self.center_y = self.center_y or (self.y + (self.background:getHeight() / 2))
+  self.center_x = self.center_x or (self.x + (Status.BACKGROUND:getWidth() / 2))
+  self.center_y = self.center_y or (self.y + (Status.BACKGROUND:getHeight() / 2))
   self.center_cursor = self.center_cursor or Cursor.NewCursor(self.center_x, self.center_y)
   self.center_cursor:reset()
   return self.center_cursor
 end
 
 function Status:draw()
-  love.graphics.draw(self.background, self.x, self.y)
+  love.graphics.draw(Status.BACKGROUND, self.x, self.y)
   self:drawHealth(self.cursor)
   self:drawFocus(self.cursor)
   love.graphics.reset()
@@ -53,7 +53,7 @@ end
 function Status:drawFocus(cursor)
   cursor:reset()
   width, height = Status.FULLFOC:getWidth(), Status.FULLFOC:getHeight()
-  cursor:moveBy(self.background:getWidth() - Status.PADDING_X*3, 0)
+  cursor:moveBy(Status.BACKGROUND:getWidth() - Status.PADDING_X*3, 0)
   for i=1,self.character.max_focus do
     if i <= self.character.current_focus then
       image = Status.FULLFOC

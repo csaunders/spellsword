@@ -26,7 +26,7 @@ adjustmentX, adjustmentY = 0, 0
 timer = nil
 
 function love.load()
-  --if arg and arg[#arg] == "-debug" then require("mobdebug").start() end
+  if arg and arg[#arg] == "-debug" then require("mobdebug").start() end
   if lovetest.detect(arg) then lovetest.run() end
   
   splash = SplashRenderer:NewSplash("Frank Face Games")
